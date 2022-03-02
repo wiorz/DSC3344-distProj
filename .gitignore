@@ -37,3 +37,8 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# other files  
+test.R
+ui-dani.R 
+ui-copy.R
