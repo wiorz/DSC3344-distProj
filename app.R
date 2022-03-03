@@ -185,19 +185,8 @@ ui <- fluidPage(
                        "Logarithmic (Mean, Standard Deviation)" = "L",
                        "Poisson (Lambda)" = "P")),
         
-        actionButton("uiOutput","Run Simulation"),
+        actionButton("uiOutput","Run Simulation")
         
-        # additional instructions on how to run the simulation
-        # h5('Additional Comments'),
-        # helpText('The parameter that has to be included is specified on parenthesis next to 
-        #       the distribution name. If only one variable is included, do not input
-        #       the second parameter'),
-        # h6('For Uniform distribution:'),
-        # helpText('First parameter must be larger than second parameter.'),
-        # h6('For Binomial distribution:'),
-        # helpText('Second parameter must be the decimal representation of the probability.'),
-        # h6('For Logarithmic distribution:'),
-        # helpText('Second parameter must be the decimal representation of st. deviation.')
     ),
     
     # plotting the distributions
@@ -233,8 +222,7 @@ server <- function(input, output, session) {
                          </style>
                          The parameter that has to be included is specified on 
                          parenthesis next to the distribution name,<br>
-                         <pre class='tab1'>i.e. Normal(<b>Mean, 
-                          Standard Deviation</b>).</pre><br>
+                         <pre class='tab1'>Normal(<b>Mean, Standard Deviation</b>)</pre><br>
                          If only one variable is shown, the second parameter is 
                          not used.<br><br>
                          <h3>For Uniform distribution:</h3><br>
