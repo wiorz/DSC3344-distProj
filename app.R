@@ -4,13 +4,19 @@
 #          Ivan Ko, 
 #          Claire Teng, 
 #          Ty Wicks
-# Description: 
+# Description: The purpose of the Central Limit Theorem Simulation is to 
+# display the normal, exponential, uniform, binomial, chi square, student t, 
+# logarithmic, and poisson distributions of an unordered set of objects. 
+# The user can use the slider to select an input value, referencing the 
+# additional comments as a guide, then running the simulation to update the 
+# graphs. Radio buttons provide option for distribution types when can be ran 
+# upon selection. 
 
 library(shiny)
 
 # global var
 rep <- sample(5000:20000, 1) # Replications is a random integer select from range
-# for sampling distribution, use [inf] instead of sample()
+# For sampling distribution, use [inf] instead of sample()
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -102,10 +108,10 @@ server <- function(input, output, session) {
                  }
     )
     
-    # reset values on UI
+    # Reset values on UI
     observeEvent(input$resetTrigger, 
                  {
-                   uiParam$n = 1
+                   uiParam$n = 1 # this is why we need the input to be reactive
                    uiParam$par1 = 1
                    uiParam$par2 = 0
                    updateTextInput(session, "n", value = uiParam$n)
@@ -133,11 +139,11 @@ server <- function(input, output, session) {
                                                   input$par2,
                                                   input$par1),
                                             rep),
+                               # par2 needs to be a percentage in decimal form for B
                                "B" = matrix(rbinom(input$n*rep, 
                                                    input$par1,
                                                    input$par2),
                                             rep),
-                               # par2 needs to be a percentage in decimal form
                                "X" = matrix(rchisq(input$n*rep,
                                                    input$par1),
                                             rep),
@@ -178,7 +184,7 @@ server <- function(input, output, session) {
                      xlab="Means")
             }
             
-        }, height=855, width=800)  
+        }, height=855, width=800)
 }
 
 # Run the application 
