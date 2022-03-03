@@ -61,8 +61,8 @@ dynamic <- function(input, output) {
           # Plot graphs in form of 2 rows with one graph per row.  
           # mar and oma for space control
           par(mfrow=c(2,1), mar=c(3,1,5,1), oma=c(0,1,3,0)) #TODO: play with this to make it look pretty!
-          hist(container$sample,    
-               main="Distribution of Samples",            
+          hist(container$sample,
+               main="Distribution of Samples",
                ylab="Frequency", 
                col= "aquamarine4")
           hist(container$means, 

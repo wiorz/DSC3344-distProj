@@ -40,7 +40,6 @@ vignettes/*.pdf
 
 # other files  
 test.R
-ui_dani.R 
+ui-dani.R 
 ui-copy.R
-ui_copy.R 
 what.txt
