@@ -87,7 +87,9 @@ server <- function(input, output, session) {
     # need this to reset values on the UI, otherwise they are read-only
     uiVar <- reactiveValues(n = 1,
                             par1 = 1,
-                            par2 = 0
+                            par2 = 0,
+                            startVal = 1,
+                            stepVal = 0
     )
     
     # Settings for helper text
@@ -123,9 +125,14 @@ server <- function(input, output, session) {
                    uiVar$n = 1 # this is why we need the input to be reactive
                    uiVar$par1 = 1
                    uiVar$par2 = 0
+                   uiVar$startVal = 1
+                   uiVar$stepVal = 1
                    updateTextInput(session, "n", value = uiVar$n)
                    updateTextInput(session, "par1", value = uiVar$par1)
                    updateTextInput(session, "par2", value = uiVar$par2)
+                   updateTextInput(session, "startSize", value = uiVar$startVal)
+                   updateTextInput(session, "stepSize", value = uiVar$stepVal)
+                   
                    
                    # reset container values too to trigger plot clear in logic
                    container$sample = NULL
