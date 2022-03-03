@@ -19,8 +19,9 @@ ui <- fluidPage(
         h6(a("Referenced from: https://github.com/coursephd/week4shinyApp")),
         
         # user selection on input size 
-        # user selection on input size 
-        numericInput("n","Input Sample Size (Integer)", 1),
+        sliderInput(inputId="n",
+                    "Sample Size (n)",
+                    value=30, min=1, max=2000, step=20),
         
         # parameters 
         numericInput("par1","First Parameter", 1),
@@ -30,7 +31,7 @@ ui <- fluidPage(
         radioButtons("src.dist", "Select Distribution:",
                      c("Normal (Mean, Standard Deviation)" = "N",
                        "Exponential (Mean)" = "E",
-                       "Uniform (Max, Min)" = "U",
+                       "Uniform (Min, Max)" = "U",
                        "Binomial (Size, Success Probability)" = "B",
                        "Chi Square (Degree of Freedom,  Non-centrality Parameter)" = "X", 
                        "Student t (Degree of Freedom)" = "T",
@@ -86,14 +87,14 @@ server <- function(input, output) {
                                                    input$par1),
                                               rep),
                                  "U" = matrix(runif(input$n*rep,
-                                                    input$par2,
-                                                    input$par1),
+                                                    input$par1,
+                                                    input$par2),
                                               rep),
                                  "B" = matrix(rbinom(input$n*rep, 
                                                      input$par1,
                                                      input$par2),
                                               rep),
-                                 # par2 needs to be a percentage in decimal form
+                                 # par2 needs to be a percentage in decimal form for binom
                                  "X" = matrix(rchisq(input$n*rep,
                                                      input$par1),
                                               rep),
