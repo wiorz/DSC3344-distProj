@@ -59,7 +59,7 @@ ui <- fluidPage(
         
         h3(" - Animation - "),
         actionBttn("start", "Start", style = "jelly", color = "success"),
-        actionBttn("stop", "Stop", style = "unite", color = "danger"),
+        actionBttn("stop", "Stop", style = "jelly", color = "danger"),
         actionBttn("resetTrigger", "Reset", style = "jelly", color = "warning"),
         h4("Warning: Stop before using Reset!")
         
@@ -328,17 +328,10 @@ server <- function(input, output, session) {
                 abline(v = meanMean,
                        col = "gray30",
                        lwd = 3)
-                # add mean text
-                # TODO: somehow this is not showing... fix?
-                # text(x = meanMean * 1.5,
-                #      y = meanMean * 1.5,
-                #      paste("Mean =", meanMean),
-                #      col = "red",
-                #      cex = 2)
                 
                 # add mean density curve, only draw when more then 2 reps!
                 if(container$curStep >= 2){
-                  lines(density(container$means), col = "dodgerblue3", lwd = 2)
+                  lines(density(container$means), col = "dodgerblue3", lwd = 4)
                 }
             }
             
