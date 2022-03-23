@@ -13,7 +13,7 @@
 # upon selection. 
 
 library(shiny)
-library(shinyWidgets)
+library(shinyWidgets) # for actionbttn, nicer looking actionbutton variant
 
 # global var
 SLEEPTIME = 420
@@ -71,20 +71,23 @@ ui <- fluidPage(
           fluidRow(
             plotOutput("plotOut"),
           ),
-          # visual data on same row
+          # display current process in text form.  
+          # the formatting is a hack because I can't get the fluidPanel to
+          # auto-adjust the text position. Without the padding the text would 
+          # appear overlapped with the plot and no amount of layering fluidRow
+          # and div can help... so padding with hardcoded values it is.
           fluidRow(
-            column(width = 6, offset = 0, 
-                  style="padding-left:0px; padding-top:450px;",
+            column(width = 4, offset = 0, 
+                  style="padding-left:0px; padding-top:480px;",
                    textOutput("stepOut")
             ),
             column(8, 
+                   style="padding-left:0px; padding-top:480px;",
                    textOutput("sampleCount")
             )
           )
         )
     )
-    
-    
     
 )
 
