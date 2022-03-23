@@ -317,7 +317,7 @@ server <- function(input, output, session) {
                      cex = 2)
                 # add mean density curve, only draw when more then 2 reps!
                 if(container$curStep >= 2){
-                  lines(density(container$means), col = 2, lwd = 2)
+                  lines(density(container$means), col = "blue", lwd = 2)
                 }
             }
             
