@@ -38,11 +38,11 @@ ui <- fluidPage(
         # user enter input for population and sample size, and repetition
         numericInput("n","Input Population Size (Integer)", 100, min = 0),
         numericInput("sam","Sample Draw Size (Integer)", 10, min = 1),
-        numericInput("rep", "Repetition of Drawing Samples from Same Population", 1, min = 1),
+        numericInput("rep", "Repetition of Drawing Samples from Same Population", 50, min = 1),
         
         # parameters 
-        numericInput("par1","First Parameter", 1),
-        numericInput("par2","Second Parameter", 0, min = 0),
+        numericInput("par1","First Parameter", 10),
+        numericInput("par2","Second Parameter", 3, min = 0),
 
         # selection of distribution type
         radioButtons("src.dist", "Select Distribution:",
@@ -162,10 +162,10 @@ server <- function(input, output, session) {
     
     # need this to reset values on the UI, otherwise they are read-only
     uiVar <- reactiveValues(n = 100,
-                            par1 = 1,
-                            par2 = 0,
+                            par1 = 10,
+                            par2 = 3,
                             sam = 10,
-                            rep = 1
+                            rep = 50
     )
     
     # Settings for helper text
@@ -199,9 +199,9 @@ server <- function(input, output, session) {
     observeEvent(input$resetTrigger, 
                  {
                    uiVar$n = 100 # this is why we need the input to be reactive
-                   uiVar$par1 = 1
-                   uiVar$par2 = 0
-                   uiVar$rep = 1
+                   uiVar$par1 = 10
+                   uiVar$par2 = 3
+                   uiVar$rep = 50
                    uiVar$sam = 10
                    updateTextInput(session, "n", value = uiVar$n)
                    updateTextInput(session, "par1", value = uiVar$par1)
@@ -313,15 +313,20 @@ server <- function(input, output, session) {
                      col= "aquamarine4",
                      xlab = "Sample")
                 
-                hist(container$means, 
+                mean_info <- hist(container$means, 
+                                  plot = FALSE)
+                mean_info$density <- mean_info$counts/sum(mean_info$counts)
+                plot(mean_info, freq = FALSE, 
                      main="Distribution of Aggregated Means",
-                     ylab="Frequency", 
+                     ylab="Density", 
                      col="goldenrod3",
-                     xlab="Means")
+                     xlab="Means",
+                     ylim= c(0.0, 1.0)) # ylim is key if we want the density line below to fit overlay nicely
+                
                 # add mean line
                 meanMean = mean(container$means)
                 abline(v = meanMean,
-                       col = "red",
+                       col = "gray30",
                        lwd = 3)
                 # add mean text
                 # TODO: somehow this is not showing... fix?
@@ -333,7 +338,7 @@ server <- function(input, output, session) {
                 
                 # add mean density curve, only draw when more then 2 reps!
                 if(container$curStep >= 2){
-                  lines(density(container$means), col = "blue", lwd = 2)
+                  lines(density(container$means), col = "dodgerblue3", lwd = 2)
                 }
             }
             
