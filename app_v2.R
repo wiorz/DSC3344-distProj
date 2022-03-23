@@ -14,10 +14,6 @@
 
 library(shiny)
 
-# global var
-rep <- sample(5000:20000, 1) # Replications is a random integer select from range
-# For sampling distribution, use [inf] instead of sample()
-
 # Define UI for application that draws a histogram
 ui <- fluidPage(
     sidebarPanel(
@@ -33,7 +29,7 @@ ui <- fluidPage(
         h6(a("Referenced from: https://github.com/coursephd/week4shinyApp")),
         
         actionButton("helpTrigger", "Help"),
-        actionButton("resetTrigger", "reset"),
+        actionButton("resetTrigger", "Reset"),
         
         # user enter input for sample size 
         numericInput("n","Input Sample Size (Integer)", 1),
@@ -41,6 +37,7 @@ ui <- fluidPage(
         # parameters 
         numericInput("par1","First Parameter", 1),
         numericInput("par2","Second Parameter", 0),
+        numericInput("rep", "Repetition", 10),
         
         # selection of distribution type
         radioButtons("src.dist", "Select Distribution:",
@@ -69,7 +66,8 @@ ui <- fluidPage(
         
         # visual data on same row
         fluidRow(
-          textOutput("sampleCount")
+          textOutput("sampleCount"),
+          textOutput("sampleMean")
         )
     ) 
 )
@@ -88,8 +86,10 @@ server <- function(input, output, session) {
     uiVar <- reactiveValues(n = 1,
                             par1 = 1,
                             par2 = 0,
+    			    rep = 10,
                             startVal = 1,
-                            stepVal = 0
+                            stepVal = 0,
+    			    mean = 0.0
     )
     
     # Settings for helper text
@@ -127,22 +127,25 @@ server <- function(input, output, session) {
                    uiVar$par2 = 0
                    uiVar$startVal = 1
                    uiVar$stepVal = 1
+                   uiVar$rep = 10
+                   uiVar$mean = 0.0
                    updateTextInput(session, "n", value = uiVar$n)
                    updateTextInput(session, "par1", value = uiVar$par1)
                    updateTextInput(session, "par2", value = uiVar$par2)
                    updateTextInput(session, "startSize", value = uiVar$startVal)
                    updateTextInput(session, "stepSize", value = uiVar$stepVal)
+                   updateTextInput(session, "rep", value = uiVar$rep)
                    
                    
                    # reset container values too to trigger plot clear in logic
                    container$sample = NULL
-                   container$mean = NULL # mean isn't needed but for compeleteness
+                   container$means = NULL # mean isn't needed but for completeness
                  }, priority = 100
     )
   
     # function for making distribution 
     # input: n = sample size, par1 = parameter 1, par2 = parameter 2
-    distributionSwitch <- function(n, par1, par2)
+    distributionSwitch <- function(n, par1, par2, rep)
     {
       sampleInstance <- switch(input$src.dist,
                                # Each label is a matrix of size rep, filled with 
@@ -180,13 +183,17 @@ server <- function(input, output, session) {
       # plotting container requires numeric values!
       container$sample <- as.numeric(sampleInstance[1,])
       container$means <- as.numeric(apply(sampleInstance,1,mean))
+      uiVar$mean <- mean(container$means)
     }
     # Using observeEvent() to get values from UI's actionButton()
     # Extract input from UI's output using input$[variable], i.e. input$par1
     observeEvent(input$runSim, 
                  {
                    uiVar$n = input$n # set for dynamic text output
-                   distributionSwitch(input$n, input$par1, input$par2)
+                   distributionSwitch(input$n, 
+                   		      input$par1, 
+                   		      input$par2,
+                   		      input$rep)
       
                   }
       )
@@ -199,9 +206,12 @@ server <- function(input, output, session) {
       req(input$stepSize)
       req(input$par1)
       req(input$par2)
+      req(input$rep)
+      
+      set.seed(runif(1) * as.numeric(Sys.time())) # reset seed
       
       # remake and recalculate variables
-      distributionSwitch(uiVar$n, input$par1, input$par2)
+      distributionSwitch(uiVar$n, input$par1, input$par2, input$rep)
       
       uiVar$n = uiVar$n + input$stepSize # increment
       
@@ -211,7 +221,7 @@ server <- function(input, output, session) {
     counter$timer <- reactiveTimer(Inf)
     observeEvent(input$start,{
       uiVar$n = input$startSize # set start size here before increment
-      counter$timer<-reactiveTimer(500)
+      counter$timer<-reactiveTimer(900)
       observeEvent(counter$timer(),{
         anime()
       })
@@ -259,6 +269,10 @@ server <- function(input, output, session) {
       paste("\nCurrent Sample:",uiVar$n)
     })
     
+    # Update dynamic numeric variable
+    output$sampleMean<-renderText({
+    	paste("\nCurrent Mean:",uiVar$mean)
+    })
 }
 
 # Run the application 
