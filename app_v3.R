@@ -16,8 +16,8 @@ library(shiny)
 library(shinyWidgets)
 
 # global var
-SLEEPTIME = 300
-DEBUG = TRUE
+SLEEPTIME = 420
+DEBUG = FALSE
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -67,13 +67,25 @@ ui <- fluidPage(
     
     # plotting the distributions
     mainPanel(
-        plotOutput("plotOut"),
-        
-        # visual data on same row
-        fluidRow(
-          textOutput("sampleCount")
+        fluidPage(
+          fluidRow(
+            plotOutput("plotOut"),
+          ),
+          # visual data on same row
+          fluidRow(
+            column(width = 6, offset = 0, 
+                  style="padding-left:0px; padding-top:450px;",
+                   textOutput("stepOut")
+            ),
+            column(8, 
+                   textOutput("sampleCount")
+            )
+          )
         )
-    ) 
+    )
+    
+    
+    
 )
 
 
@@ -122,6 +134,7 @@ server <- function(input, output, session) {
     {
       # plotting container requires numeric values!
       curSam <- as.numeric(sample(container$pop, input$sam))
+      container$curSample <- curSam
       container$samples <- append(container$samples, 
                                  curSam)
       container$means <- append(container$means,
@@ -139,6 +152,7 @@ server <- function(input, output, session) {
     # Container for the variables needed for simulation.
     container <- reactiveValues(pop = NULL,
                                 samples = NULL,
+                                curSample = NULL,
                                 means = NULL,
                                 curStep = 0
                                 )
@@ -218,7 +232,7 @@ server <- function(input, output, session) {
       )
     
     # use to loop the plot by changing variables in multiple simulations
-    anime <- function(timer)
+    anime <- function()
     {
       # check for data existence first
       req(input$rep)
@@ -230,19 +244,16 @@ server <- function(input, output, session) {
       # a bug/feature is that it allows us to dynamically update the graph since  
       # it's still istening on the renderPlot(), since input$start is one of the 
       # triggers
-      # req(container$curStep < input$rep)
+      req(container$curStep < input$rep)
       
       # remake and recalculate variables
       sampleChange()
       
       container$curStep = container$curStep + 1
-      
-      # if(container$curStep >= input$rep)
-      # {
-      #   timer<-reactiveTimer(Inf)
-      #   return()
-      # }
-   
+      if(container$curStep >= input$rep)
+      {
+        return()
+      }
       
     }
     
@@ -293,14 +304,14 @@ server <- function(input, output, session) {
                      col= "grey",
                      xlab = "Population")
                 
-                hist(container$samples,    
-                     main="Distribution of Samples",            
+                hist(container$curSample,    
+                     main="Distribution of Current Sample Drawn",
                      ylab="Frequency", 
                      col= "aquamarine4",
-                     xlab = "Samples")
+                     xlab = "Sample")
                 
                 hist(container$means, 
-                     main="Sampling Distribution of the Mean",  
+                     main="Distribution of Aggregated Means",
                      ylab="Frequency", 
                      col="goldenrod3",
                      xlab="Means")
@@ -310,11 +321,13 @@ server <- function(input, output, session) {
                        col = "red",
                        lwd = 3)
                 # add mean text
-                text(x = meanMean * 1.5,
-                     y = meanMean * 1.5,
-                     paste("Mean =", meanMean),
-                     col = "red",
-                     cex = 2)
+                # TODO: somehow this is not showing... fix?
+                # text(x = meanMean * 1.5,
+                #      y = meanMean * 1.5,
+                #      paste("Mean =", meanMean),
+                #      col = "red",
+                #      cex = 2)
+                
                 # add mean density curve, only draw when more then 2 reps!
                 if(container$curStep >= 2){
                   lines(density(container$means), col = "blue", lwd = 2)
@@ -324,10 +337,14 @@ server <- function(input, output, session) {
         }, height=855, width=800)
     
     # Update dynamic numeric variable
-    output$sampleCount<-renderText({
-      paste("\nCurrent Step:", container$curStep)
-      paste("\nCurrent Samples Count:", length(container$samples))
+    output$stepOut<-renderText({
+      paste("\nCurrent Step: ", container$curStep)
     })
+    
+    output$sampleCount<-renderText({
+      paste("\nTotal Samples Count: ", length(container$samples))
+    })
+    
     
 }
 
